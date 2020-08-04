@@ -173,8 +173,8 @@ class ObjLocaliser(object):
         step = STEP_FACTOR * boxW
         # This action preserves box width and height
         if newbox[2] + step < self.image_playground.shape[0]:
-            newbox[0] += step
-            newbox[2] += step
+            newbox[0] += np.int64(step)
+            newbox[2] += np.int64(step)
         else:
             newbox[0] = self.image_playground.shape[0] - boxW - 1
             newbox[2] = self.image_playground.shape[0] - 1
@@ -231,10 +231,10 @@ class ObjLocaliser(object):
 
         widthChange = newDelta * boxW / 2.0
         heightChange = newDelta * boxH / 2.0
-        newbox[0] -= widthChange
-        newbox[1] -= heightChange
-        newbox[2] += widthChange
-        newbox[3] += heightChange
+        newbox[0] -= np.int64(widthChange)
+        newbox[1] -= np.int64(heightChange)
+        newbox[2] += np.int64(widthChange)
+        newbox[3] += np.int64(heightChange)
 
         return newbox
 
@@ -266,8 +266,8 @@ class ObjLocaliser(object):
                 newDelta =  0.0
 
         heightChange = newDelta * boxH / 2.0
-        newbox[1] -= heightChange
-        newbox[3] += heightChange
+        newbox[1] -= np.int64(heightChange)
+        newbox[3] += np.int64(heightChange)
 
 
         return newbox
@@ -286,11 +286,11 @@ class ObjLocaliser(object):
 
         # This action preserves box width and height
         if newbox[0] - step >= 0:
-            newbox[0] -= step
-            newbox[2] -= step
+            newbox[0] -= np.int64(step)
+            newbox[2] -= np.int64(step)
         else:
             newbox[0] = 0
-            newbox[2] = boxW
+            newbox[2] = np.int64(boxW)
 
         return newbox
 
@@ -344,10 +344,10 @@ class ObjLocaliser(object):
                 newDelta = MIN_BOX_SIDE /  boxH - 1
         widthChange = newDelta * boxW / 2.0
         heightChange = newDelta * boxH / 2.0
-        newbox[0] += widthChange
-        newbox[1] += heightChange
-        newbox[2] -= widthChange
-        newbox[3] -= heightChange
+        newbox[0] += np.int64(widthChange)
+        newbox[1] += np.int64(heightChange)
+        newbox[2] -= np.int64(widthChange)
+        newbox[3] -= np.int64(heightChange)
 
         return newbox
 
@@ -363,7 +363,7 @@ class ObjLocaliser(object):
         boxW = newbox[2] - newbox[0]
         if boxW >  MIN_BOX_SIDE:
             half = boxW / 2.0
-            newbox[2] -= half
+            newbox[2] -= np.int64(half)
         return newbox
 
    
@@ -378,7 +378,7 @@ class ObjLocaliser(object):
         boxH = newbox[3] - newbox[1]
         if boxH > MIN_BOX_SIDE:
             half = boxH/2.0
-            newbox[3] -= half
+            newbox[3] -= np.int64(half)
         return newbox
 
  
@@ -408,8 +408,8 @@ class ObjLocaliser(object):
             if ar < MIN_ASPECT_RATIO:
                 newDelta =  0.0
         widthChange = newDelta * boxW / 2.0
-        newbox[0] -= widthChange
-        newbox[2] += widthChange
+        newbox[0] -= np.int64(widthChange)
+        newbox[2] += np.int64(widthChange)
 
         return newbox
 

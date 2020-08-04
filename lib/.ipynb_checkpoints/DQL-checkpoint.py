@@ -13,8 +13,14 @@ from DNN import *
 from Agent import ObjLocaliser
 
 
-
-
+"""
+Code from limit memory GPU
+"""
+#"""
+config = tf.ConfigProto()
+config.gpu_options.allow_growth=True
+sess = tf.Session(config=config)
+#"""
 
 
 def preparedataset():
@@ -23,7 +29,8 @@ def preparedataset():
     """
 
     # Path to the dataset annotation
-    xml_path = "../GE_MAMMO/Annotations/pectoral_muscle/*.xml"
+    #xml_path = "../GE_MAMMO/Annotations/pectoral_muscle/*.xml"
+    xml_path = "../VOC2012/Annotations/*.xml"
     # Path to the prepared data
     destination = "../data/"
 
@@ -82,7 +89,7 @@ def evaluate(tmp, state_processor, policy, sess, num_of_proposal=15):
 
     # Creates an object localizer instance
     #im2 = Image.frombytes("RGB",(img['image_width'],img['image_height']),img['image']) PARA RGB
-    im2 = Image.frombytes("L",(img['image_width'],img['image_height']),img['image'])
+    im2 = Image.frombytes("RGB",(img['image_width'],img['image_height']),img['image'])
     env = ObjLocaliser(np.array(im2),target)
 
 
@@ -288,7 +295,7 @@ def DQL(num_episodes,
 
                 # Creates an object localizer instance
                 #im2 = Image.frombytes("RGB",(img['image_width'],img['image_height']),img['image']) PARA RGB
-                im2 = Image.frombytes("L",(img['image_width'],img['image_height']),img['image'])
+                im2 = Image.frombytes("RGB",(img['image_width'],img['image_height']),img['image'])
                 env = ObjLocaliser(np.array(im2),target)
                 print ("Image{} is being loaded: {}".format(indx, img['image_filename']))
                 f.write("Image{} is being loaded: {}".format(indx, img['image_filename']))
