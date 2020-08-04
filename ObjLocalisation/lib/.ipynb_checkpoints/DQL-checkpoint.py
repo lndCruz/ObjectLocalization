@@ -25,7 +25,7 @@ sess = tf.Session(config=config)
 
 def preparedataset():
     """
-    Downloads VOC 2012 dataset and prepares it to be used for training and testing. 
+    Downloads VOC 2012 dataset and prepares it to be used for training and Testing. 
     """
 
     # Path to the dataset annotation
