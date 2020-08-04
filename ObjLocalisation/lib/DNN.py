@@ -5,6 +5,14 @@ import tensorflow as tf
 import cv2
 from os.path import join
 
+"""
+Code from limit memory GPU
+"""
+#"""
+config = tf.ConfigProto()
+config.gpu_options.allow_growth=True
+sess = tf.Session(config=config)
+#"""
 
 # Agent Actions: 0 (right), 1 (down), 2 (scale up), 3 (aspect ratio up), 4 (left), 5 (up), 6 (scale down), 7 (aspect ratio down), 8 (split horizontal), 9 (split vetical), and 10 (termination) are valid actions
 
@@ -39,6 +47,9 @@ class StateProcessor():
         #state = np.zeros((224, 224, 1)) #Essa linha foi inserida para quando imagem for grayscale
         #quando for RGB, basta remover a linha de cima.
 
+        #state = np.zeros((84, 84, 3))
+        #print("lllll {}".format(state.shape))
+        
         return sess.run(self.output, { self.input_state: state })
 
 
