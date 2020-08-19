@@ -27,10 +27,10 @@ class StateProcessor():
 
         # Build the Tensorflow graph
         with tf.variable_scope("state_processor"):
-            self.input_state = tf.placeholder(shape=[84, 84, 3], dtype=tf.uint8) #Essa linha para quando for RGB
+            self.input_state = tf.placeholder(shape=[256, 256, 3], dtype=tf.uint8) #Essa linha para quando for RGB
             #self.input_state = tf.placeholder(shape=[224, 224, 1], dtype=tf.uint8)
-            self.output = tf.image.rgb_to_grayscale(self.input_state) #Essa linha e a de baixo eh para quando a entrada da imagem for RGB
-            self.output = tf.image.resize_images(self.output, [84, 84], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+            self.output = tf.image.rgb_to_grayscale(self.input_state)
+            self.output = tf.image.resize_images(self.output, [256, 256], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
             #self.output = tf.image.resize_images(self.input_state, [224, 224], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
             self.output = tf.squeeze(self.output)
 
@@ -81,7 +81,7 @@ class Estimator():
 
         # Placeholders for our input
         # Our input are 4 RGB frames of shape 84, 84 each
-        self.X_pl = tf.placeholder(shape=[None, 84, 84, 4], dtype=tf.uint8, name="X") #RGB
+        self.X_pl = tf.placeholder(shape=[None, 256, 256, 3], dtype=tf.uint8, name="X") #RGB
         #self.X_pl = tf.placeholder(shape=[None, 224, 224, 4], dtype=tf.uint8, name="X")
         # The TD target value
         self.y_pl = tf.placeholder(shape=[None], dtype=tf.float32, name="y")
@@ -151,7 +151,10 @@ class Estimator():
           Tensor of shape [batch_size, NUM_VALID_ACTIONS] containing the estimated 
           action values.
         """
-
+        #s.reshape(84,84,3)
+        #s = np.zeros((1, 84, 84, 3))
+        #print("NOVOOOOOOOOOOOOOOO TESTEEEEEEEEEE {}".format(teste.shape))
+        #print("TESSSSSSSTTANNNNDOOOOOOOOOOOOOO {}".format(s.shape))
         return sess.run(self.predictions, { self.X_pl: s, self.keep_prob: keep_prob })
     
     def visulize_layers(self, sess, s, layer):

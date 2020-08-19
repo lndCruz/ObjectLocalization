@@ -71,8 +71,13 @@ def load_image(addr):
     Returns:
        Converted image to string
     """
-
-    img = np.array(Image.open(addr))
+    
+    #Original
+    #img = np.array(Image.open(addr))
+    
+    #para converter imagem acrescentei .convert(rgB)
+    img = np.array(Image.open(addr).convert("RGB"))
+    
     return img.tostring()
 
 
@@ -143,8 +148,9 @@ def create_example(xml_file):
         poses.append(member.find("pose").text)
 
     #Finding the corresponding image and turnining it to a string.
-    #full_path = os.path.join('../GE_MAMMO/JPEGImages', '{}'.format(image_name))
-    full_path = os.path.join('../VOC2012/JPEGImages', '{}'.format(image_name))
+    full_path = os.path.join('../GE_MAMMO/JPEGImages', '{}'.format(image_name))
+    #full_path = os.path.join('../VOC2012/JPEGImages', '{}'.format(image_name))
+    #full_path = os.path.join('../DIR/JPEGImages', '{}'.format(image_name))
 
     img = load_image(full_path)
 

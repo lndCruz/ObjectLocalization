@@ -44,7 +44,8 @@ def visualizing_seq_act(model_name, add, ground_truth, output_name):
 
 
         # Creates an object localizer instance
-        im2 = np.array(Image.open(add))
+        #para converter imagem acrescentei .convert(rgB)
+        im2 = np.array(Image.open(add).convert("RGB"))
         
         env = ObjLocaliser(np.array(im2),{'xmin':[ground_truth[0]], 'xmax':[ground_truth[2]], 'ymin':[ground_truth[1]], 'ymax':[ground_truth[3]]})
 
@@ -90,8 +91,10 @@ def visualizing_seq_act(model_name, add, ground_truth, output_name):
                 # Reset the environment
                 env.Reset(np.array(im2))
                 state = env.wrapping()
+                #print ("######################## shape {}".format(state[...,:3].shape))
+                print ("######################## shape {}".format(state.shape))
                 state = state_processor.process(sess, state)
-                state = np.stack([state] * 4, axis=2)
+                state = np.stack([state] * 3, axis=2)
 
                 t=0
                 action = 0

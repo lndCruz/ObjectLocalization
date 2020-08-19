@@ -6,11 +6,15 @@ import psutil
 import tensorflow as tf
 from PIL import Image
 
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
 from collections import namedtuple
 from readingFileEfficiently import *
 import VOC2012_npz_files_writter
 from DNN import *
 from Agent import ObjLocaliser
+import cv2
 
 
 """
@@ -25,12 +29,15 @@ sess = tf.Session(config=config)
 
 def preparedataset():
     """
-    Downloads VOC 2012 dataset and prepares it to be used for training and testing. 
+    Downloads VOC 2012 dataset and prepares it to be used for training and Testing. 
     """
 
     # Path to the dataset annotation
-    #xml_path = "../GE_MAMMO/Annotations/pectoral_muscle/*.xml"
-    xml_path = "../VOC2012/Annotations/*.xml"
+    xml_path = "../GE_MAMMO/Annotations/nipple/*.xml"
+    #xml_path = "../VOC2012/Annotations/*.xml"
+    #xml_path = "../DIR/Annotations/*.xml"
+
+
     # Path to the prepared data
     destination = "../data/"
 
@@ -101,7 +108,7 @@ def evaluate(tmp, state_processor, policy, sess, num_of_proposal=15):
         env.Reset(np.array(im2))
         state = env.wrapping()
         state = state_processor.process(sess, state)
-        state = np.stack([state] * 4, axis=2)
+        state = np.stack([state] * 3, axis=2)
 
         t=0
         action = 0
@@ -193,6 +200,7 @@ def DQL(num_episodes,
 
 
     with tf.Session() as sess:
+        
 
         # Initializes the network weights
         sess.run(tf.initialize_all_variables())
@@ -254,14 +262,23 @@ def DQL(num_episodes,
         for indx,tmp in enumerate(extractData(category, "train", batch_size)):
         
             #Contador para ver quantas imagens foram lidas
-            contImage += 1
+            #contImage += 1
             
-            if contImage >= 453:
-                break;
+            #if contImage >= 453:
+                #break;
             
             # Unpacking image and ground truth 
             img=tmp[0]
             target=tmp[1]
+            
+            """
+            ESSE TRECH EH PARA IMPRIMIR IMAGEM LOGO DE CARA
+            #im2 = Image.frombytes("RGB",(img['image_width'],img['image_height']),img['image'])
+            #teste = ObjLocaliser(np.array(im2),target)
+                
+            #CODIGO PARA VER ACOES
+            #teste.drawActions(img['image_filename'])
+            """
 
             # The first 100 images are used for evaluation
             if len(eval_set) < 100:
@@ -297,6 +314,10 @@ def DQL(num_episodes,
                 #im2 = Image.frombytes("RGB",(img['image_width'],img['image_height']),img['image']) PARA RGB
                 im2 = Image.frombytes("RGB",(img['image_width'],img['image_height']),img['image'])
                 env = ObjLocaliser(np.array(im2),target)
+                
+                #CODIGO PARA VER ACOES
+                #env.drawActions(img['image_filename'])
+                
                 print ("Image{} is being loaded: {}".format(indx, img['image_filename']))
                 f.write("Image{} is being loaded: {}".format(indx, img['image_filename']))
 
@@ -309,7 +330,7 @@ def DQL(num_episodes,
                     env.Reset(np.array(im2))
                     state = env.wrapping()
                     state = state_processor.process(sess, state)
-                    state = np.stack([state] * 4, axis=2)
+                    state = np.stack([state] * 3, axis=2)
 
                     # Populating replay memory with the minimum threshold 
                     for i in range(replay_memory_init_size):
@@ -339,16 +360,18 @@ def DQL(num_episodes,
                                 env.Reset(np.array(im2))
                                 state = env.wrapping()
                                 state = state_processor.process(sess, state)
-                                state = np.stack([state] * 4, axis=2)
+                                state = np.stack([state] * 3, axis=2)
                             else:
                                 state = next_state
                         except:
                             pass
 
-
+                
                 # Num of episodes that Agent can interact with an input image 
                 for i_episode in range(num_episodes):
 
+                    #env.drawActions(img['image_filename'])
+                    
                     # Save the current checkpoint
                     saver.save(tf.get_default_session(), checkpoint_path)
 
@@ -356,7 +379,7 @@ def DQL(num_episodes,
                     env.Reset(np.array(im2))
                     state = env.wrapping()
                     state = state_processor.process(sess, state)
-                    state = np.stack([state] * 4, axis=2)
+                    state = np.stack([state] * 3, axis=2)
                     loss = None
                     t=0
                     action = 0
@@ -365,7 +388,7 @@ def DQL(num_episodes,
 
                     # The agent searches in an image until terminatin action is used or the agent reaches threshold 50 actions
                     while (action != 10) and (t < 50):
-
+                        
                         # Epsilon for this time step
                         epsilon = epsilons[min(total_t, epsilon_decay_steps-1)]
 
@@ -422,7 +445,7 @@ def DQL(num_episodes,
                             # Counting number of correct localized objects
                             if reward == 3:
                                 num_located += 1
-
+                                
                             state = next_state
                             t += 1
                             total_t += 1
@@ -446,8 +469,10 @@ def DQL(num_episodes,
 
                     print("Episode Reward: {} Episode Length: {}".format(r, t))
                     f.write("Episode Reward: {} Episode Length: {}".format(r, t))
-            
-
+                    
+                    #SALVANDO IMAGENS
+                    env.drawActions(img['image_filename'])
+        
         
         print('total de imagens TREINADAS {}'.format(contImage))
         f.write("total de imagens TREINADAS {}".format(contImage))
