@@ -27,7 +27,7 @@ PLACE_LANDMARK     = 10
 
 
 # Transformation coefficients
-DIMENSION = 84
+DIMENSION = 256
 STEP_FACTOR = 0.2
 MAX_ASPECT_RATIO = 6.00
 MIN_ASPECT_RATIO = 0.15
@@ -84,6 +84,10 @@ class ObjLocaliser(object):
         numOfObj = len(boundingBoxes['xmax'])
         objs = []
         for i in range(numOfObj):
+            
+            #print("TESTANDO DENTRO DO METODO GETTING TARGERREAD xmin {}, ymin {}, xmax {}, ymax{}".format(boundingBoxes['xmin'][i]*self.xscale, boundingBoxes['ymin'][i]*self.yscale, boundingBoxes['xmax'][i]*self.xscale, boundingBoxes['ymax'][i]*self.yscale))
+            
+            
             temp = [boundingBoxes['xmin'][i]*self.xscale, boundingBoxes['ymin'][i]*self.yscale, boundingBoxes['xmax'][i]*self.xscale, boundingBoxes['ymax'][i]*self.yscale]
             objs.append(temp)
         return objs
@@ -194,8 +198,8 @@ class ObjLocaliser(object):
         step = STEP_FACTOR * boxH
         # This action preserves box width and height
         if newbox[3] + step < self.image_playground.shape[1]:
-            newbox[1] += step
-            newbox[3] += step
+            newbox[1] += np.int64(step)
+            newbox[3] += np.int64(step)
         else:
             newbox[1] = self.image_playground.shape[1] - boxH - 1
             newbox[3] = self.image_playground.shape[1] - 1
@@ -308,11 +312,11 @@ class ObjLocaliser(object):
         step = STEP_FACTOR * boxH
         # This action preserves box width and height
         if newbox[1] - step >= 0:
-            newbox[1] -= step
-            newbox[3] -= step
+            newbox[1] -= np.int64(step)
+            newbox[3] -= np.int64(step)
         else:
             newbox[1] = 0
-            newbox[3] = boxH
+            newbox[3] = np.int64(boxH)
 
         return newbox
 
@@ -572,20 +576,20 @@ class ObjLocaliser(object):
         # If the action is the trigger then the new IoU will compare to the threshold 0.5 
         if termination:
 
-            if (new_iou > 0.5):
+            if (new_iou > 0.2):
                 reward = 3
             else:
                 reward = -3
             self.iou = 0
-        #print("O valor de IOU é: {}".format(new_iou))
+        print("O valor de IOU é: {}".format(new_iou))
         return reward
 
 
-    def drawActions(self):
+    def drawActions(self,imageName):
         """
         This function is to show the image with bounding boxes and the agent current window 
         """
-
+        nameImage = str(imageName)
         fig,ax = plt.subplots(1)
         ax.imshow(self.image_playground)
         
@@ -596,6 +600,7 @@ class ObjLocaliser(object):
             rect2 = patches.Rectangle((target[0],target[1]),target[2]-target[0],target[3]-target[1],linewidth=1,edgecolor='b',facecolor='none')
             ax.add_patch(rect2)
 
+        fig.savefig('../experiments/default_model/anim/'+ nameImage+'.png')
         plt.draw()
         plt.show()
         

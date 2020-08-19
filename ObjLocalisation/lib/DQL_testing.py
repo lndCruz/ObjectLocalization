@@ -100,7 +100,7 @@ def DQL_testing(num_episodes, category, model_name):
                 env.Reset(np.array(im2))
                 state = env.wrapping()
                 state = state_processor.process(sess, state)
-                state = np.stack([state] * 4, axis=2)
+                state = np.stack([state] * 3, axis=2)
 
                 t=0
                 action = 0
@@ -137,6 +137,8 @@ def DQL_testing(num_episodes, category, model_name):
             precisions.append(float(succ)/num_episodes)
             print ("image {} precision: {}".format(img['image_filename'], precisions[-1]))
 
+            #SALVANDO IMAGENS
+            env.drawActions(img['image_filename'])
 
 
     print ("num of images:{}".format(len(precisions)))

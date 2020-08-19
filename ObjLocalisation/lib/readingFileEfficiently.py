@@ -13,7 +13,7 @@ def giveData(which_set, batch_size):
     """
     if which_set == 'train':
         #for i in range(1,4): #Origin
-        for i in range(1,4):
+        for i in range(1,2):
             print ("input file {} is loading...".format(i))
             yield VOC2012DataProvider.PascalDataProvider(i, which_set = which_set, batch_size = batch_size)
     elif which_set == 'test':
