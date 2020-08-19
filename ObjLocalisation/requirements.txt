@@ -6,4 +6,4 @@ psutil==3.4.2
 pickleshare==0.6
 cloudpickle==0.5.3
 tensorboard==1.10.0      
-tensorflow==1.8.0 
+tensorflow==1.15.2 
