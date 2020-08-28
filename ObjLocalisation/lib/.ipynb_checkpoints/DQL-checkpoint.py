@@ -94,6 +94,8 @@ def evaluate(tmp, state_processor, policy, sess, num_of_proposal=15):
     target=tmp[1]
     succ = 0
 
+    FN = 0 #para calcular falso negativo da MAP
+    
     # Creates an object localizer instance
     #im2 = Image.frombytes("RGB",(img['image_width'],img['image_height']),img['image']) PARA RGB
     im2 = Image.frombytes("RGB",(img['image_width'],img['image_height']),img['image'])
@@ -125,6 +127,9 @@ def evaluate(tmp, state_processor, policy, sess, num_of_proposal=15):
         # If an object is successfuly localized increase counter
             if reward == 3:
                 succ += 1
+                
+            if reward == -3:
+                FN += 1
             # Observing next state
             next_state = env.wrapping()
             #leo aqui
@@ -141,8 +146,9 @@ def evaluate(tmp, state_processor, policy, sess, num_of_proposal=15):
             except:
                 t+=1
 
-    return (float(succ)/num_of_proposal)
-
+    #return (float(succ)/num_of_proposal)
+    return (float(succ)/float(succ + FN))
+   
 
 
 
