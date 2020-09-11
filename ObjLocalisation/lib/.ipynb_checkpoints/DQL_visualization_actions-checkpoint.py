@@ -103,9 +103,9 @@ def visualizing_seq_act(model_name, add, ground_truth, output_name):
                 # The agent searches in an image until terminatin action is used or the agent reaches threshold 50 actions
                 while (action != 10) and (t < 50):
                     
-                    print("stopActions {}".format(stopActions))
-                    if stopActions == 100:
-                        final_reward=3
+                    #print("stopActions {}".format(stopActions))
+                    #if stopActions == 100:
+                        #final_reward=3
                         
                     # Choosing action based on epsilon-greedy with probability 0.8
                     action_probs, qs = policy(sess, state, 0.2)
@@ -126,7 +126,7 @@ def visualizing_seq_act(model_name, add, ground_truth, output_name):
                     state = next_state
 
                     t += 1
-                    stopActions+=1
+                    #stopActions+=1
                     
                     #leoAqui
                     print("Action: {}".format(action))

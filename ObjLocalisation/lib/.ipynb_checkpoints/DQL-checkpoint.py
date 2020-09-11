@@ -268,10 +268,10 @@ def DQL(num_episodes,
         for indx,tmp in enumerate(extractData(category, "train", batch_size)):
         
             #Contador para ver quantas imagens foram lidas
-            #contImage += 1
+            contImage += 1
             
-            #if contImage >= 453:
-                #break;
+            if contImage >= 416:
+                break;
             
             # Unpacking image and ground truth 
             img=tmp[0]
@@ -321,8 +321,6 @@ def DQL(num_episodes,
                 im2 = Image.frombytes("RGB",(img['image_width'],img['image_height']),img['image'])
                 env = ObjLocaliser(np.array(im2),target)
                 
-                #CODIGO PARA VER ACOES
-                #env.drawActions(img['image_filename'])
                 
                 print ("Image{} is being loaded: {}".format(indx, img['image_filename']))
                 f.write("Image{} is being loaded: {}".format(indx, img['image_filename']))
@@ -341,9 +339,26 @@ def DQL(num_episodes,
                     # Populating replay memory with the minimum threshold 
                     for i in range(replay_memory_init_size):
 
-                        # Epsilon for this time step 
-                        action_probs, _ = policy(sess, state, epsilons[min(total_t, epsilon_decay_steps-1)])
-                        action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
+                        print("############################################")
+                        print("##########")
+                        print("##########")
+                        print("Tamanho do threshold replay memory " + str(i))
+                        print("##########")
+                        print("##########")
+                        print("############################################")
+                        
+                        #Criando decisao para permitir que o usuario insira 100 anotações
+                        #Primeiro o usuario precisa olhar a imagem salva no DIR anim
+                        if i > 400:
+                            env.drawActions(img['image_filename'])
+                            print("Input your advice:")
+                            action = int(input())
+                            
+                        else:
+                        
+                            # Epsilon for this time step 
+                            action_probs, _ = policy(sess, state, epsilons[min(total_t, epsilon_decay_steps-1)])
+                            action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
 
                         # Takes action and observes new state and reward
                         reward = env.takingActions(VALID_ACTIONS[action])
@@ -375,8 +390,6 @@ def DQL(num_episodes,
                 
                 # Num of episodes that Agent can interact with an input image 
                 for i_episode in range(num_episodes):
-
-                    #env.drawActions(img['image_filename'])
                     
                     # Save the current checkpoint
                     saver.save(tf.get_default_session(), checkpoint_path)
@@ -476,8 +489,8 @@ def DQL(num_episodes,
                     print("Episode Reward: {} Episode Length: {}".format(r, t))
                     f.write("Episode Reward: {} Episode Length: {}".format(r, t))
                     
-                    #SALVANDO IMAGENS
-                    env.drawActions(img['image_filename'])
+                    #SALVANDO IMAGENS NO DIR ANIM COM BBOX AND GT
+                    #env.drawActions(img['image_filename'])
         
         
         print('total de imagens TREINADAS {}'.format(contImage))

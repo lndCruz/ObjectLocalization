@@ -581,7 +581,7 @@ class ObjLocaliser(object):
             else:
                 reward = -3
             self.iou = 0
-        print("O valor de IOU é: {}".format(new_iou))
+        #print("O valor de IOU é: {}".format(new_iou))
         return reward
 
 
