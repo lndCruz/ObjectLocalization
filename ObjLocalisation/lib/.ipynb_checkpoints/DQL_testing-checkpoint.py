@@ -79,6 +79,9 @@ def DQL_testing(num_episodes, category, model_name):
 
         contImage = 0
         
+        qtd_imageDetected = 0 #para saber quantas imagens foram detectadas corretamente
+        image_detected = 0 #para saber quantas imagens foram detecadas corremtante
+        
         for indx,tmp in enumerate(extractData(category, "test", 32)):
 
             
@@ -106,7 +109,7 @@ def DQL_testing(num_episodes, category, model_name):
                 action = 0
 
                 # The agent searches in an image until terminatin action is used or the agent reaches threshold 50 actions
-                while (action != 10) and (t < 50):
+                while (action != 10) and (t < 100):
 
                     # Choosing action based on epsilon-greedy with probability 0.8
                     action_probs, qs = policy(sess, state, 0.2)
@@ -121,6 +124,7 @@ def DQL_testing(num_episodes, category, model_name):
                         if reward == 3:
                             succ += 1
 
+
                         # Processing the new state
                         next_state = state_processor.process(sess, next_state)
                         next_state = np.append(state[:,:,1:], np.expand_dims(next_state, 2), axis=2)
@@ -132,13 +136,19 @@ def DQL_testing(num_episodes, category, model_name):
                         pass
 
                 print ("number of actions for step {} is: {}".format(i_episode, t))
+                
+            #Coloquei essas verificaceos para ver quantas imagens o agente detectou corretamente
+            if reward == 3:
+                qtd_imageDetected += 1 #Inseri essa variavel para verificar quantas imagens foi detectadas
+                
+                #SALVANDO IMAGENS
+                env.drawActions(img['image_filename'])
+                    
 
             contImage += 1
             precisions.append(float(succ)/num_episodes)
             print ("image {} precision: {}".format(img['image_filename'], precisions[-1]))
 
-            #SALVANDO IMAGENS
-            env.drawActions(img['image_filename'])
 
 
     print ("num of images:{}".format(len(precisions)))
@@ -146,6 +156,8 @@ def DQL_testing(num_episodes, category, model_name):
     print ("num Total of images:{}".format(contImage))
 
     print ("mean precision: {}".format(np.mean(precisions)))
+    
+    print ("quantidade de imagens que o agente conseguiu detectar a papila: {}".format(qtd_imageDetected))
 
     return np.mean(precisions)
 

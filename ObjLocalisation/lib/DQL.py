@@ -17,6 +17,11 @@ from Agent import ObjLocaliser
 import cv2
 
 
+#LeoAqui
+import math
+from confidenceCheck import calcConfidence
+
+
 """
 Code from limit memory GPU
 """
@@ -116,7 +121,7 @@ def evaluate(tmp, state_processor, policy, sess, num_of_proposal=15):
         action = 0
 
         # The agent searches in an image until terminatin action is used or the agent reaches threshold 50 actions
-        while (action != 10) and (t < 50):
+        while (action != 10) and (t < 100):
 
 
             # Choosing action based on epsilon-greedy with probability 0.8
@@ -263,6 +268,10 @@ def DQL(num_episodes,
         done = False
         num_located = 0
         contImage = 0
+        qtd_imageDetected = 0 #para saber quantas imagens foram detectadas corretamente
+        lossMax=0
+        resultado = 0
+        cont_image = 0
 
         # Loads images from dataset
         for indx,tmp in enumerate(extractData(category, "train", batch_size)):
@@ -270,7 +279,7 @@ def DQL(num_episodes,
             #Contador para ver quantas imagens foram lidas
             contImage += 1
             
-            if contImage >= 416:
+            if contImage >= 100:
                 break;
             
             # Unpacking image and ground truth 
@@ -287,18 +296,18 @@ def DQL(num_episodes,
             """
 
             # The first 100 images are used for evaluation
-            if len(eval_set) < 100:
+            if len(eval_set) < 10:
                 print ("Populating evaluation set...")
                 eval_set.append(tmp)
 
             else:
                 # Every 20 images the neural network is evaluated
-                if indx%20 == 0:
+                if indx%10 == 0:
                     print ("Evaluation started ...")
                     print("Every 20 images the neural network is evaluated")
                     for tmp2 in eval_set:
                         eval_pre.append(evaluate(tmp2, state_processor, policy, sess))
-                        if len(eval_pre) > 99:
+                        if len(eval_pre) > 9:
                              
                             # Saves the result of evaluation with Tensorboard
                             print ("Evaluation mean precision: {}".format(np.mean(eval_pre)))
@@ -349,7 +358,10 @@ def DQL(num_episodes,
                         
                         #Criando decisao para permitir que o usuario insira 100 anotações
                         #Primeiro o usuario precisa olhar a imagem salva no DIR anim
-                        if i > 399:
+                        if i > 500:
+                            if i == 400:#Essa verificacao eh para garantir na primeira vez o reset antes do input do usuario
+                                env.Reset(np.array(im2))
+                                
                             env.drawActions(img['image_filename'])
                             print("Input your advice:")
                             action = int(input())
@@ -387,9 +399,12 @@ def DQL(num_episodes,
                         except:
                             pass
 
+                vet = [] # define um vetor vazio para armazenar as acoes
                 
                 # Num of episodes that Agent can interact with an input image 
                 for i_episode in range(num_episodes):
+                    
+                    actionAdvice = 0 #LeoAqui
                     
                     # Save the current checkpoint
                     saver.save(tf.get_default_session(), checkpoint_path)
@@ -406,7 +421,7 @@ def DQL(num_episodes,
                     r = 0
 
                     # The agent searches in an image until terminatin action is used or the agent reaches threshold 50 actions
-                    while (action != 10) and (t < 50):
+                    while (action != 10) and (t < 100):
                         
                         # Epsilon for this time step
                         epsilon = epsilons[min(total_t, epsilon_decay_steps-1)]
@@ -416,11 +431,41 @@ def DQL(num_episodes,
                             estimator_copy.make(sess)
                             print("\nCopied model parameters to target network.")
 
+                        #Realizando a verificao da confidence
+                        #if resultado <= 1.0:
 
+                            # Take a step
+                            #action_probs, qs = policy(sess, state, epsilon)
+                            #action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
+                        
+                        if contImage <=21:
+                            print("Qtd de imagens já lidas {}".format(contImage))
+                            
+                            if (i_episode + 1) == 1:
 
-                        # Take a step
-                        action_probs, qs = policy(sess, state, epsilon)
-                        action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
+                                print("valor que jah tem na matriz " + str(vet))
+                                
+                                env.drawActions(img['image_filename'])
+                                print("Input your advice:")
+                                action = int(input())
+                                
+                                
+                            else:
+                                print("Acoes que estao na matriz" + str(vet))
+                                action = vet[actionAdvice]
+                                print("Acao escolhida " + str(action))
+                                actionAdvice += 1
+                        
+                        #if action == 10:
+                            #env.drawActions(img['image_filename'])
+                            #print("confirma a acao? ")
+                            #action = int(input())
+                        
+                        else:
+                            action_probs, qs = policy(sess, state, epsilon)
+                            action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
+                        
+                        vet.append(action)
                         
                         # Takes action and observes new state and its reward
                         reward = env.takingActions(VALID_ACTIONS[action])
@@ -457,6 +502,26 @@ def DQL(num_episodes,
                             # Perform gradient descent update
                             states_batch = np.array(states_batch)
                             loss = q_estimator.update(sess, states_batch, action_batch, targets_batch)
+                            
+                            #TESTE LEO
+                            #
+                            #
+                            #calcConfidence(loss)
+                            #
+                            #
+                            ######
+                            if(loss > lossMax):
+                                lossMax = loss
+                             
+                            #print("loss"+str(loss)+ ""+"lossMax" +str(lossMax))
+                            #t = math.sqrt(loss/3.0)-1
+                            x = math.sqrt(loss/lossMax)
+                            y = np.log(x)
+                            
+                            resultado = -1/y-1
+
+                            #print("CHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMMMMMMMMMMMMMMMMMMMMMMOOUUUUUU " + str(resultado))
+                            
                             print("Step {} ({}) @ Episode {}/{}, action {}, reward {},loss: {}".format(t, total_t, i_episode + 1, num_episodes, action, reward, loss))
                             f.write("Step {} ({}) @ Episode {}/{}, action {}, reward {},loss: {}\n".format(t, total_t, i_episode + 1, num_episodes, action, reward, loss))
 
@@ -491,7 +556,15 @@ def DQL(num_episodes,
                     
                     #SALVANDO IMAGENS NO DIR ANIM COM BBOX AND GT
                     #env.drawActions(img['image_filename'])
-        
+                    
+                    if reward == 3:
+                        cont_image += 1
+                    
+                #Coloquei essas verificaceos para ver quantas imagens o agente detectou corretamente
+                if cont_image >= 1:
+                    qtd_imageDetected += 1
+                    cont_image = 0;
+                    
         
         print('total de imagens TREINADAS {}'.format(contImage))
         f.write("total de imagens TREINADAS {}".format(contImage))
@@ -499,7 +572,7 @@ def DQL(num_episodes,
         f.write("Categoria das imagens {}".format(category))
         
     f.close()
-    print ("number of correct located objects:{}".format(num_located))
+    print ("quantidade de imagens que o agente conseguiu detectar a papila: {}".format(qtd_imageDetected))
 
 
 
