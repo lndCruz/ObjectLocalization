@@ -576,7 +576,7 @@ class ObjLocaliser(object):
         # If the action is the trigger then the new IoU will compare to the threshold 0.5 
         if termination:
 
-            if (new_iou >= 0.3):
+            if (new_iou >= 0.7):
                 reward = 3
             else:
                 reward = -3

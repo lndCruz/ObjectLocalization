@@ -139,7 +139,7 @@ def DQL_testing(num_episodes, category, model_name):
                 
             #Coloquei essas verificaceos para ver quantas imagens o agente detectou corretamente
             if reward == 3:
-                qtd_imageDetected += 1 #Inseri essa variavel para verificar quantas imagens foi detectadas
+                qtd_imageDetected += 1 #Inseri essa variavel para verificar quantas imagens foram detectadas
                 
                 #SALVANDO IMAGENS
                 env.drawActions(img['image_filename'])
@@ -157,7 +157,7 @@ def DQL_testing(num_episodes, category, model_name):
 
     print ("mean precision: {}".format(np.mean(precisions)))
     
-    print ("quantidade de imagens que o agente conseguiu detectar a papila: {}".format(qtd_imageDetected))
+    print ("quantidade de imagens que o agente conseguiu detectar corretamente: {}".format(qtd_imageDetected))
 
     return np.mean(precisions)
 

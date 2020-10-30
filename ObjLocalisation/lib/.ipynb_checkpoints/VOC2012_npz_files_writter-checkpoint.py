@@ -44,7 +44,8 @@ def class_text_to_int(row_label):
         "chair": 20,
         "polyp": 21,
         "nipple":22,
-        "pectoral":23
+        "pectoral":23,
+        "cardiomegaly":24
     }
 
     if row_label in switcher.keys():
@@ -148,7 +149,7 @@ def create_example(xml_file):
         poses.append(member.find("pose").text)
 
     #Finding the corresponding image and turnining it to a string.
-    full_path = os.path.join('../GE_MAMMO/JPEGImages', '{}'.format(image_name))
+    full_path = os.path.join('../CXR_Cardiomegaly/JPEGImages', '{}'.format(image_name))
     #full_path = os.path.join('../VOC2012/JPEGImages', '{}'.format(image_name))
     #full_path = os.path.join('../DIR/JPEGImages', '{}'.format(image_name))
 
@@ -205,7 +206,7 @@ def writting_files(xml_dir, dest_dir):
         example = create_example(xml_file)
 
         # Every 5th file (xml and image) is writen for test set
-        if (i%5)==0:
+        if (i%4)==0:
 
             temp = {'image_height':example['image_height'], 'image_width':example['image_width'], 'image_depth':example['image_depth'], 'image':example['image'], 'image_filename':example['image_filename']}
             test_input.append(temp)

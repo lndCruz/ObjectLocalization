@@ -38,7 +38,7 @@ def preparedataset():
     """
 
     # Path to the dataset annotation
-    xml_path = "../GE_MAMMO/Annotations/nipple/*.xml"
+    xml_path = "../CXR_Cardiomegaly/Annotations/cardiomegaly/*.xml"
     #xml_path = "../VOC2012/Annotations/*.xml"
     #xml_path = "../DIR/Annotations/*.xml"
 
@@ -59,7 +59,7 @@ def preparedataset():
         #	print "download finished."
 
         # Unziping the dataset
-        if not os.path.isdir("../GE_MAMMO"):
+        if not os.path.isdir("../CXR_Cardiomegaly"):
 
             print ("Unziping the files ...")
             os.system("tar xf ../VOCtrainval_11-May-2012.tar -C ../")
@@ -279,21 +279,21 @@ def DQL(num_episodes,
             #Contador para ver quantas imagens foram lidas
             contImage += 1
             
-            if contImage >= 100:
-                break;
+            #if contImage >= 100:
+                #break;
             
             # Unpacking image and ground truth 
             img=tmp[0]
             target=tmp[1]
             
-            """
-            ESSE TRECH EH PARA IMPRIMIR IMAGEM LOGO DE CARA
+            
+            #ESSE TRECH EH PARA IMPRIMIR IMAGEM LOGO DE CARA
             #im2 = Image.frombytes("RGB",(img['image_width'],img['image_height']),img['image'])
             #teste = ObjLocaliser(np.array(im2),target)
                 
             #CODIGO PARA VER ACOES
             #teste.drawActions(img['image_filename'])
-            """
+            
 
             # The first 100 images are used for evaluation
             if len(eval_set) < 10:
@@ -438,34 +438,36 @@ def DQL(num_episodes,
                             #action_probs, qs = policy(sess, state, epsilon)
                             #action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
                         
-                        if contImage <=21:
-                            print("Qtd de imagens já lidas {}".format(contImage))
+                        #if contImage <= 30:
+                            #print("Qtd de imagens já lidas {}".format(contImage))
                             
-                            if (i_episode + 1) == 1:
+                            #if (i_episode + 1) == 1:
 
-                                print("valor que jah tem na matriz " + str(vet))
+                                #print("valor que jah tem na matriz " + str(vet))
                                 
-                                env.drawActions(img['image_filename'])
-                                print("Input your advice:")
-                                action = int(input())
+                                #env.drawActions(img['image_filename'])
+                                #print("Input your advice:")
+                                #action = int(input())
                                 
                                 
-                            else:
-                                print("Acoes que estao na matriz" + str(vet))
-                                action = vet[actionAdvice]
-                                print("Acao escolhida " + str(action))
-                                actionAdvice += 1
+                            #else:
+                                #print("Acoes que estao na matriz" + str(vet))
+                                #action = vet[actionAdvice]
+                                #print("Acao escolhida " + str(action))
+                                #actionAdvice += 1
                         
                         #if action == 10:
                             #env.drawActions(img['image_filename'])
                             #print("confirma a acao? ")
                             #action = int(input())
                         
-                        else:
-                            action_probs, qs = policy(sess, state, epsilon)
-                            action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
+                        #else:
+                            #action_probs, qs = policy(sess, state, epsilon)
+                            #action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
                         
-                        vet.append(action)
+                        #vet.append(action)
+                        action_probs, qs = policy(sess, state, epsilon)
+                        action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
                         
                         # Takes action and observes new state and its reward
                         reward = env.takingActions(VALID_ACTIONS[action])
@@ -572,7 +574,7 @@ def DQL(num_episodes,
         f.write("Categoria das imagens {}".format(category))
         
     f.close()
-    print ("quantidade de imagens que o agente conseguiu detectar a papila: {}".format(qtd_imageDetected))
+    print ("quantidade de imagens que o agente conseguiu detectar corretamente: {}".format(qtd_imageDetected))
 
 
 
