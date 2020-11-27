@@ -109,7 +109,7 @@ def DQL_testing(num_episodes, category, model_name):
                 action = 0
 
                 # The agent searches in an image until terminatin action is used or the agent reaches threshold 50 actions
-                while (action != 10) and (t < 100):
+                while (action != 8) and (t < 700):
 
                     # Choosing action based on epsilon-greedy with probability 0.8
                     action_probs, qs = policy(sess, state, 0.2)

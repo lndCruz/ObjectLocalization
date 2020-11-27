@@ -20,7 +20,7 @@ if __name__== "__main__":
 
     parser.add_argument('-n','--num_episodes', type=int, default=5, help = "Number of episodes that the agect can interact with an image. Default: 5")
     parser.add_argument('-rms','--replay_memory_size', type=int, default=500000, help = "Number of the most recent experiences that would be stored. Default: 500000")
-    parser.add_argument('-rmis','--replay_memory_init_size', type=int, default=500, help = "Number of experiences to initialize replay memory. Default: 500")
+    parser.add_argument('-rmis','--replay_memory_init_size', type=int, default=100, help = "Number of experiences to initialize replay memory. Default: 500")
     parser.add_argument('-u','--update_target_estimator_every', type=int, default=10000, help = "Number of steps after which estimator parameters are copied to target network. Default: 10000")
     parser.add_argument('-d','--discount_factor', type=int, default=0.99, help = "Discount factor. Default: 0.99")
     parser.add_argument('-es','--epsilon_start', type=int, default=1.0, help = "Epsilon decay schedule start point. Default: 1.0")

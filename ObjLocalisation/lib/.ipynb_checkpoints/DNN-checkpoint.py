@@ -16,7 +16,8 @@ sess = tf.Session(config=config)
 
 # Agent Actions: 0 (right), 1 (down), 2 (scale up), 3 (aspect ratio up), 4 (left), 5 (up), 6 (scale down), 7 (aspect ratio down), 8 (split horizontal), 9 (split vetical), and 10 (termination) are valid actions
 
-VALID_ACTIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+#VALID_ACTIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+VALID_ACTIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
 
 class StateProcessor():

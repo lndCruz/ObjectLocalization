@@ -20,9 +20,10 @@ MOVE_LEFT          = 4
 MOVE_UP            = 5
 SCALE_DOWN         = 6
 ASPECT_RATIO_DOWN  = 7
-SPLIT_HORIZONTAL   = 8
-SPLIT_VERTICAL     = 9
-PLACE_LANDMARK     = 10
+PLACE_LANDMARK     = 8
+#SPLIT_HORIZONTAL   = 8
+#SPLIT_VERTICAL     = 9
+
 
 
 
@@ -146,10 +147,6 @@ class ObjLocaliser(object):
             newbox = self.scaleDown()
         elif action == ASPECT_RATIO_DOWN:
             newbox = self.aspectRatioDown()
-        elif action == SPLIT_HORIZONTAL:
-            newbox = self.splitHorizontal()
-        elif action == SPLIT_VERTICAL:
-            newbox = self.splitVertical()
         elif action == PLACE_LANDMARK:
             newbox = self.placeLandmark()
             termination = True
@@ -576,7 +573,7 @@ class ObjLocaliser(object):
         # If the action is the trigger then the new IoU will compare to the threshold 0.5 
         if termination:
 
-            if (new_iou >= 0.7):
+            if (new_iou >= 0.5):
                 reward = 3
             else:
                 reward = -3

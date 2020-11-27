@@ -39,6 +39,9 @@ def preparedataset():
 
     # Path to the dataset annotation
     xml_path = "../CXR_Cardiomegaly/Annotations/cardiomegaly/*.xml"
+    #xml_path = "../CXR_Mass/Annotations/mass/*.xml"
+    
+    #xml_path = "../CXR_Infiltration/Annotations/infiltrate/*.xml"
     #xml_path = "../VOC2012/Annotations/*.xml"
     #xml_path = "../DIR/Annotations/*.xml"
 
@@ -59,7 +62,7 @@ def preparedataset():
         #	print "download finished."
 
         # Unziping the dataset
-        if not os.path.isdir("../CXR_Cardiomegaly"):
+        if not os.path.isdir("../CXR_Infiltration"):
 
             print ("Unziping the files ...")
             os.system("tar xf ../VOCtrainval_11-May-2012.tar -C ../")
@@ -121,7 +124,7 @@ def evaluate(tmp, state_processor, policy, sess, num_of_proposal=15):
         action = 0
 
         # The agent searches in an image until terminatin action is used or the agent reaches threshold 50 actions
-        while (action != 10) and (t < 100):
+        while (action != 8) and (t < 700):
 
 
             # Choosing action based on epsilon-greedy with probability 0.8
@@ -155,7 +158,10 @@ def evaluate(tmp, state_processor, policy, sess, num_of_proposal=15):
     return (float(succ)/float(succ + FN))
    
 
-
+#Tentativa de Implementando aqui o artigo teaching on budget
+# Teaching on a Budget in Multi-Agent Deep Reinforcement Learning
+    
+    
 
 def DQL(num_episodes,
      replay_memory_size,
@@ -275,12 +281,12 @@ def DQL(num_episodes,
 
         # Loads images from dataset
         for indx,tmp in enumerate(extractData(category, "train", batch_size)):
-        
+                        
             #Contador para ver quantas imagens foram lidas
             contImage += 1
             
-            #if contImage >= 100:
-                #break;
+            if contImage >= 31:
+                break;
             
             # Unpacking image and ground truth 
             img=tmp[0]
@@ -302,7 +308,7 @@ def DQL(num_episodes,
 
             else:
                 # Every 20 images the neural network is evaluated
-                if indx%10 == 0:
+                if indx%9 == 0:
                     print ("Evaluation started ...")
                     print("Every 20 images the neural network is evaluated")
                     for tmp2 in eval_set:
@@ -358,8 +364,8 @@ def DQL(num_episodes,
                         
                         #Criando decisao para permitir que o usuario insira 100 anotações
                         #Primeiro o usuario precisa olhar a imagem salva no DIR anim
-                        if i > 500:
-                            if i == 400:#Essa verificacao eh para garantir na primeira vez o reset antes do input do usuario
+                        if i < 100:
+                            if i == 1:#Essa verificacao eh para garantir na primeira vez o reset antes do input do usuario
                                 env.Reset(np.array(im2))
                                 
                             env.drawActions(img['image_filename'])
@@ -378,7 +384,7 @@ def DQL(num_episodes,
                         
                         
                         # Checks whether termination action is taken
-                        if action == 10:
+                        if action == 8:
                             done = True
                         else:
                             done = False
@@ -406,6 +412,9 @@ def DQL(num_episodes,
                     
                     actionAdvice = 0 #LeoAqui
                     
+                    #Variavel que limite a quantidade de vezes que o usuario vai poder dar conselhos
+                    budget = 5
+                    
                     # Save the current checkpoint
                     saver.save(tf.get_default_session(), checkpoint_path)
 
@@ -414,14 +423,14 @@ def DQL(num_episodes,
                     state = env.wrapping()
                     state = state_processor.process(sess, state)
                     state = np.stack([state] * 3, axis=2)
-                    loss = None
+                    loss = 0
                     t=0
                     action = 0
                     e = 0
                     r = 0
 
                     # The agent searches in an image until terminatin action is used or the agent reaches threshold 50 actions
-                    while (action != 10) and (t < 100):
+                    while (action != 8) and (t < 700):
                         
                         # Epsilon for this time step
                         epsilon = epsilons[min(total_t, epsilon_decay_steps-1)]
@@ -431,41 +440,74 @@ def DQL(num_episodes,
                             estimator_copy.make(sess)
                             print("\nCopied model parameters to target network.")
 
+                                
                         #Realizando a verificao da confidence
                         #if resultado <= 1.0:
 
                             # Take a step
                             #action_probs, qs = policy(sess, state, epsilon)
                             #action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
-                        
-                        #if contImage <= 30:
-                            #print("Qtd de imagens já lidas {}".format(contImage))
                             
-                            #if (i_episode + 1) == 1:
+                        #else:
+                            #env.drawActions(img['image_filename'])
+                            #print("Input your advice:")
+                            #action = int(input()) 
+                        '''
+                        if contImage <= 30:
+                            print("Qtd de imagens já lidas {}".format(contImage))
+                            
+                            if (i_episode + 1) == 1:
 
-                                #print("valor que jah tem na matriz " + str(vet))
+                                print("valor que jah tem na matriz " + str(vet))
                                 
-                                #env.drawActions(img['image_filename'])
-                                #print("Input your advice:")
-                                #action = int(input())
+                                env.drawActions(img['image_filename'])
+                                print("Input your advice:")
+                                action = int(input())
                                 
                                 
-                            #else:
-                                #print("Acoes que estao na matriz" + str(vet))
-                                #action = vet[actionAdvice]
-                                #print("Acao escolhida " + str(action))
-                                #actionAdvice += 1
+                            else:
+                                print("Acoes que estao na matriz" + str(vet))
+                                action = vet[actionAdvice]
+                                print("Acao escolhida " + str(action))
+                                actionAdvice += 1
                         
                         #if action == 10:
                             #env.drawActions(img['image_filename'])
                             #print("confirma a acao? ")
                             #action = int(input())
                         
-                        #else:
-                            #action_probs, qs = policy(sess, state, epsilon)
-                            #action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
+                        else:
+                            action_probs, qs = policy(sess, state, epsilon)
+                            action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
                         
-                        #vet.append(action)
+                        vet.append(action)
+                        '''                       
+                        
+                        
+                        # Early advising
+                        '''
+                        #if contImage <= 15:
+                        if budget > 0:
+                            
+                            budget = budget - 1
+                            
+                            mu = loss
+                            
+
+                            print("kkkkkkkkkkkkkkkkkkkkkkkkkk {}".format(mu))  
+
+                            if mu >= 1.2:
+                                env.drawActions(img['image_filename'])
+                                print("Input your advice: ")
+                                action = int(input())
+                            else:
+                                action_probs, qs = policy(sess, state, epsilon)
+                                action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
+                        else:
+                            action_probs, qs = policy(sess, state, epsilon)
+                            action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
+
+                        '''
                         action_probs, qs = policy(sess, state, epsilon)
                         action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
                         
@@ -474,7 +516,7 @@ def DQL(num_episodes,
                         
                         next_state = env.wrapping()
                         
-                        if action == 10:
+                        if action == 8:
                             done = True
                         else:
                             done = False
