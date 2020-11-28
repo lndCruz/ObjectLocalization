@@ -38,7 +38,8 @@ def preparedataset():
     """
 
     # Path to the dataset annotation
-    xml_path = "../CXR_Cardiomegaly/Annotations/cardiomegaly/*.xml"
+    xml_path = "../GE_MAMMO/Annotations/nipple/*.xml"
+    #xml_path = "../CXR_Cardiomegaly/Annotations/cardiomegaly/*.xml"
     #xml_path = "../CXR_Mass/Annotations/mass/*.xml"
     
     #xml_path = "../CXR_Infiltration/Annotations/infiltrate/*.xml"
@@ -62,7 +63,7 @@ def preparedataset():
         #	print "download finished."
 
         # Unziping the dataset
-        if not os.path.isdir("../CXR_Infiltration"):
+        if not os.path.isdir("../GE_MAMMO"):
 
             print ("Unziping the files ...")
             os.system("tar xf ../VOCtrainval_11-May-2012.tar -C ../")
@@ -364,7 +365,7 @@ def DQL(num_episodes,
                         
                         #Criando decisao para permitir que o usuario insira 100 anotações
                         #Primeiro o usuario precisa olhar a imagem salva no DIR anim
-                        if i < 100:
+                        if i > 100:
                             if i == 1:#Essa verificacao eh para garantir na primeira vez o reset antes do input do usuario
                                 env.Reset(np.array(im2))
                                 
